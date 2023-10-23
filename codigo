@@ -1,0 +1,307 @@
+//nombre: Pokoik Lucia Laura
+//curso: 1D
+#define A 10
+#define B 12
+#define C 5
+#define D 6
+#define E 7
+#define F 9
+#define G 8
+#define SUBE 3
+#define BAJA 2
+#define numeroPrimo 4
+#define UNIDAD A4
+#define DECENA A5
+#define APAGADOS 0
+#define TIMEDISPLAYON 5
+#define SENSOR_TEMP A0
+#define MOTOR 11
+#define FOTORESISTENCIA A1
+
+int contadorDigito = 0;
+int sube = 1;
+int subePrevia = 1;
+int baja = 1;
+int bajaPrevia = 1;
+int reset = 1;
+int resetPrevia = 1;
+
+
+
+
+void setup()
+{
+  pinMode(BAJA, INPUT_PULLUP);
+  pinMode(SUBE, INPUT_PULLUP);
+  pinMode(numeroPrimo, INPUT_PULLUP);
+  
+
+  pinMode(A, OUTPUT);
+  pinMode(B, OUTPUT);
+  pinMode(C, OUTPUT);
+  pinMode(D, OUTPUT);
+  pinMode(E, OUTPUT);
+  pinMode(F, OUTPUT);
+  pinMode(G, OUTPUT);
+  pinMode(UNIDAD, OUTPUT);
+  pinMode(DECENA, OUTPUT);
+  pinMode(MOTOR, OUTPUT);
+  digitalWrite(UNIDAD, 0);
+  digitalWrite(DECENA, 0);
+  imprimirDigito(0);
+  Serial.begin(9600);
+}
+
+void loop()
+{
+    int boton = botonPresionado();
+  	int estadoPulsador = digitalRead(numeroPrimo);
+  	int lecturaSensor = analogRead(SENSOR_TEMP);
+    int conversorTemp = map(lecturaSensor,20,358,-40,125);
+  	int lecturaFotorresistencia = analogRead(FOTORESISTENCIA);
+    
+    //Serial.println(conversorTemp);
+  	 Serial.println(lecturaFotorresistencia);
+  	 
+
+    controlarMotor(lecturaFotorresistencia, lecturaSensor);
+  	if (boton == SUBE)
+    {
+      contadorDigito++;
+      if (contadorDigito > 99)
+        contadorDigito = 0;
+        
+    } 
+  	else if (boton == BAJA)
+    {
+      contadorDigito--;
+      if (contadorDigito < 0)
+        contadorDigito = 99;
+        
+    }
+  	
+  	if (estadoPulsador == HIGH)
+    {
+      imprimirCuenta(contadorDigito);     
+    }
+    else
+    {
+      bool validacionPrimo = esPrimo(contadorDigito); 
+      if(validacionPrimo)
+      {
+        imprimirCuenta(contadorDigito);
+      }
+      else if(boton == SUBE)
+      {
+       contadorDigito++;
+       if (contadorDigito > 99)
+        contadorDigito = 0; 
+      }
+      else if (boton == BAJA)
+      {     
+          contadorDigito--;
+          if (contadorDigito < 0)
+            contadorDigito = 99;      
+      }
+    }
+  	
+}
+
+
+int botonPresionado(void) // CHEQUEA SI SE PRESIONO UNA TECLA Y SI LA TECLA NO ESTABA YA APRETADA
+{
+	sube = digitalRead(SUBE);
+  	baja = digitalRead(BAJA);
+  	
+  
+  	if (sube)  // Pregunto si la tecla no esta presionada
+      subePrevia = 1;
+  	if (baja)
+      bajaPrevia = 1;
+  	
+  	if (sube == 0 && sube != subePrevia)
+    {
+      subePrevia = sube;
+      return SUBE;
+    }
+  	
+  	if (baja == 0 && baja != bajaPrevia)
+    {
+      bajaPrevia = baja;
+      return BAJA;
+    }
+  
+ return 0;
+}
+// reinicia el numero dependiendo de si el numero es UNIDAD o DECENA
+void prendeDigito(int digito)
+{
+	if (digito == UNIDAD)
+    {
+      digitalWrite(UNIDAD, LOW);
+      digitalWrite(DECENA, HIGH);
+      delay(TIMEDISPLAYON);
+    }
+  	else if (digito == DECENA)
+    {
+      digitalWrite(UNIDAD, HIGH);
+      digitalWrite(DECENA, LOW);
+      delay(TIMEDISPLAYON);
+    }
+  	else
+    {
+      digitalWrite(UNIDAD, HIGH);
+      digitalWrite(DECENA, HIGH);
+    }
+	
+}
+// Prender UNIDADES Y DECENAS dependiendo cual visualizador sea
+void imprimirCuenta(int cuenta) 
+{
+	prendeDigito(APAGADOS);
+  	imprimirDigito(cuenta / 10);
+    prendeDigito(DECENA);
+  	prendeDigito(APAGADOS);
+  	imprimirDigito(cuenta - 10 * ((int)cuenta / 10));
+ 	prendeDigito(UNIDAD); 
+}
+//imprime el contador en el visualizador de 7 segmentos
+//toma por parametro el contador
+void imprimirDigito(int digito)
+{
+	digitalWrite(A, LOW);
+  	digitalWrite(B, LOW);
+  	digitalWrite(C, LOW);
+  	digitalWrite(D, LOW);
+  	digitalWrite(E, LOW);
+  	digitalWrite(F, LOW);
+  	digitalWrite(G, LOW);
+  
+  	switch (digito)
+    {
+      case 1:
+      	{
+            digitalWrite(B, HIGH);
+  			digitalWrite(C, HIGH);
+         	break;
+        }
+      case 2:
+      	{
+            digitalWrite(A, HIGH);
+  			digitalWrite(B, HIGH);
+          	digitalWrite(D, HIGH);
+  			digitalWrite(E, HIGH);
+          	digitalWrite(G, HIGH);
+         	break;
+        }
+      case 3:
+      	{
+            digitalWrite(A, HIGH);
+  			digitalWrite(B, HIGH);
+          	digitalWrite(C, HIGH);
+  			digitalWrite(D, HIGH);
+          	digitalWrite(G, HIGH);
+         	break;
+        }
+      case 4:
+      	{
+            digitalWrite(B, HIGH);
+  			digitalWrite(C, HIGH);
+          	digitalWrite(F, HIGH);
+  			digitalWrite(G, HIGH);
+         	break;
+        }
+      case 5:
+      	{
+            digitalWrite(A, HIGH);
+  			digitalWrite(C, HIGH);
+          	digitalWrite(D, HIGH);
+  			digitalWrite(F, HIGH);
+          	digitalWrite(G, HIGH);
+         	break;
+        }
+      case 6:
+      	{
+            digitalWrite(A, HIGH);
+  			digitalWrite(C, HIGH);
+          	digitalWrite(D, HIGH);
+  			digitalWrite(E, HIGH);
+          	digitalWrite(F, HIGH);
+  			digitalWrite(G, HIGH);
+         	break;
+        }
+      case 7:
+      	{
+          	digitalWrite(A, HIGH);
+            digitalWrite(B, HIGH);
+  			digitalWrite(C, HIGH);
+         	break;
+        }
+      case 8:
+      	{
+            digitalWrite(A, HIGH);
+  			digitalWrite(B, HIGH);
+  			digitalWrite(C, HIGH);
+  			digitalWrite(D, HIGH);
+  			digitalWrite(E, HIGH);
+  			digitalWrite(F, HIGH);
+  			digitalWrite(G, HIGH);
+         	break;
+        }
+      case 9:
+      	{
+            digitalWrite(A, HIGH);
+  			digitalWrite(B, HIGH);
+  			digitalWrite(C, HIGH);
+  			digitalWrite(D, HIGH);
+          	digitalWrite(F, HIGH);
+  			digitalWrite(G, HIGH);
+         	break;
+        }
+      case 0:
+      	{
+            digitalWrite(A, HIGH);
+  			digitalWrite(B, HIGH);
+  			digitalWrite(C, HIGH);
+  			digitalWrite(D, HIGH);
+          	digitalWrite(E, HIGH);
+  			digitalWrite(F, HIGH);
+         	break;
+        }
+      
+    }   
+  	
+}
+//calcula si los numeros son primos o no 
+//toma por parametro el contador del display
+//va devolver un valor booleano: true si es un numero primo y false si no lo es
+bool esPrimo(int numero) {
+    if (numero <= 1) {
+        return false;
+    }
+    for (int i = 2; i * i <= numero; i++) {
+        if (numero % i == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+//dependiendo de que temperatura capte el sensor se prende o se apaga el motor
+//a su vez con la fotorresistencia se controla la velocidad del motor
+void controlarMotor(int lecturaFotorresistencia, int lecturaSensor) {
+    int velocidadMotor;
+    int conversorTemp = map(lecturaSensor, 20, 358, -40, 125);
+
+    if (lecturaFotorresistencia >= 854 && lecturaFotorresistencia <= 1022) {
+        velocidadMotor = map(lecturaFotorresistencia, 854, 1022, 0, 255);
+    } else {
+        velocidadMotor = 128; // Puedes ajustar este valor según tus necesidades
+    }
+
+    if (conversorTemp >= 0 && conversorTemp <= 50) {
+        digitalWrite(MOTOR, HIGH);
+        analogWrite(MOTOR, velocidadMotor);
+    } else {
+        digitalWrite(MOTOR, LOW);
+    }
+}
