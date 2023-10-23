@@ -9,4 +9,4 @@ El proyecto se conforma de un interruptor deslizante, 2 pulsadores, 2 visualizad
 Dependiendo de que lado del interruptor deslizante se encuentre los visualizadores de 7 segmentos mostraran todos los números del 0 al 99 o los primos de los mismo. Los cuales acenderan o descenderan dependiendo de cual pulsador se aprete.
 El motor se prendera si el sensor capta la temperatura entre 0 y 50 grados (sino se encuentra entre esa temperatura se apagara) y la velocidad del motor cambiara mediante la fotoresistencia.
 # Link
-https://www.tinkercad.com/things/cAmfg8xzSvZ-primer-parcial-parte-3-pokoik-lucia-laura/editel?sharecode=Fv3ydsU212oWPpX7bDaW8vcst7toSZmvfNtaIfceXak
+https://www.tinkercad.com/things/9UV4vGI1H0A-parte-4-pokoik-lucia-laura/editel?sharecode=yOjm-ngp_7kDyVjCnssBZNDmMP-I-MFA1xMBStDewZw
